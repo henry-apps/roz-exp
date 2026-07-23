@@ -34,7 +34,7 @@
             text-align: center;
             color: var(--primary);
             font-weight: 700;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
 
         .card {
@@ -44,6 +44,11 @@
             padding: 24px;
             margin-bottom: 20px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .card-server {
+            background: #eff6ff;
+            border-color: #bfdbfe;
         }
 
         h2 {
@@ -73,7 +78,7 @@
             color: var(--text-dim);
         }
 
-        input {
+        input[type="number"], input[type="time"] {
             width: 100%;
             padding: 10px;
             border: 1px solid var(--border);
@@ -85,12 +90,34 @@
 
         input:focus {
             border-color: var(--primary);
-            ring: 2px solid var(--primary);
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .checkbox-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.9rem;
+            font-weight: normal;
+            color: var(--text-main);
+            cursor: pointer;
+        }
+
+        .checkbox-label input {
+            width: auto;
+            cursor: pointer;
         }
 
         .flex-row {
             display: flex;
             gap: 8px;
+            align-items: center;
         }
 
         button {
@@ -106,6 +133,8 @@
             color: #1e293b;
             padding: 0 12px;
             font-size: 0.75rem;
+            height: 40px;
+            white-space: nowrap;
         }
 
         .btn-now:hover { background: #94a3b8; }
@@ -121,7 +150,6 @@
 
         .btn-calc:hover { background: var(--primary-hover); }
 
-        /* 結果區塊 */
         .result-box {
             display: none;
             background: #f0fdf4;
@@ -141,6 +169,12 @@
             font-weight: 800;
             font-size: 1.2rem;
             color: var(--primary);
+        }
+
+        .highlight-accent {
+            font-weight: 800;
+            font-size: 1.2rem;
+            color: var(--success);
         }
 
         .table-preview {
@@ -163,6 +197,14 @@
             text-align: center;
         }
 
+        .task-subcard {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 10px;
+        }
+
         @media (max-width: 600px) {
             .grid { grid-template-columns: 1fr; }
         }
@@ -173,6 +215,21 @@
 <div class="container">
     <h1>ROZ 升級經驗分析</h1>
 
+    <!-- 伺服器經驗加成區塊 -->
+    <div class="card card-server">
+        <h2>🌐 伺服器經驗加成設定</h2>
+        <div class="checkbox-group">
+            <label class="checkbox-label">
+                <input type="checkbox" id="enableServerBuff" onchange="toggleServerInput()"> 啟用伺服器加成
+            </label>
+        </div>
+        <div id="serverBuffContainer" style="display: none; margin-top: 8px;">
+            <label>伺服器經驗加成 % (例如 50 代表 +50%):</label>
+            <input type="number" id="serverBuffPct" value="0" min="0" placeholder="0">
+        </div>
+    </div>
+
+    <!-- 內建經驗表 -->
     <div class="card">
         <h2>📊 內建等級經驗表 (Lv 1 - 110)</h2>
         <div class="table-preview">
@@ -183,6 +240,34 @@
         </div>
     </div>
 
+    <!-- 每日任務達標紀錄區塊 -->
+    <div class="card">
+        <h2>📅 每日任務達標紀錄</h2>
+        <div class="checkbox-group">
+            <label class="checkbox-label"><input type="checkbox" id="buffChar"> 角色經驗加成 10%</label>
+            <label class="checkbox-label"><input type="checkbox" id="buffAcc"> 帳號經驗加成 10%</label>
+            <label class="checkbox-label"><input type="checkbox" id="buffPotion"> EXPUP 藥水 50%</label>
+        </div>
+
+        <div class="grid" style="margin-top: 10px;">
+            <div class="task-subcard">
+                <label style="color:var(--primary);">【90 級每日任務】</label>
+                <div class="input-group" style="margin-top: 8px;">
+                    <label>達成任務數：</label>
+                    <input type="number" id="task90Count" value="0" min="0" placeholder="0">
+                </div>
+            </div>
+            <div class="task-subcard">
+                <label style="color:var(--primary);">【100 級每日任務】</label>
+                <div class="input-group" style="margin-top: 8px;">
+                    <label>達成任務數：</label>
+                    <input type="number" id="task100Count" value="0" min="0" placeholder="0">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 經驗追蹤紀錄區塊 -->
     <div class="card">
         <h2>⏱️ 經驗追蹤紀錄</h2>
         <div class="grid">
@@ -223,26 +308,30 @@
         </div>
     </div>
 
+    <!-- 目標推估 -->
     <div class="card">
         <h2>🎯 目標等級推估</h2>
         <label>想要達到的目標等級 (Lv)</label>
         <input type="number" id="targetLv" value="110" min="2" max="110">
-        <p style="font-size: 0.75rem; color: var(--text-dim); margin-top: 5px;">* 系統將計算從「當前狀態」到達此等級所需的總時間。</p>
+        <p style="font-size: 0.75rem; color: var(--text-dim); margin-top: 5px;">* 系統將計算從「當前狀態」到達此等級所需的總時間與預估天數。</p>
         
         <button class="btn-calc" onclick="calculate()">分析每小時經驗與目標時間</button>
     </div>
 
+    <!-- 結果展現 -->
     <div id="result" class="result-box">
         <div class="res-item">間隔時間：<span id="resInterval" class="highlight">0</span> 分鐘</div>
-        <div class="res-item">每小時獲得經驗：<span id="resRate" class="highlight">0</span></div>
+        <div class="res-item">每小時獲得經驗 (純掛機)：<span id="resRate" class="highlight">0</span></div>
+        <div class="res-item">每日任務獲得總經驗：<span id="resDailyTaskExp" class="highlight">0</span></div>
         <hr style="border:0; border-top: 1px solid #bbf7d0; margin: 15px 0;">
         <div class="res-item" id="resToNext"></div>
         <div class="res-item" id="resToTarget" style="margin-top: 10px; font-weight: bold; border-top: 1px dashed #bbf7d0; padding-top: 10px;"></div>
+        <div class="res-item" id="resDailyCombined" style="margin-top: 10px; font-weight: bold; border-top: 1px dashed #bbf7d0; padding-top: 10px;"></div>
     </div>
 </div>
 
 <script>
-    // 內建經驗值表 (依據用戶提供)
+    // 內建經驗值表
     const EXP_DATA = {
         1:0, 2:2443, 3:2711, 4:3009, 5:3339, 6:3706, 7:4113, 8:4565, 9:5067, 10:5624,
         11:6242, 12:6928, 13:7690, 14:8535, 15:9473, 16:10515, 17:11671, 18:12954, 19:14378, 20:15959,
@@ -258,12 +347,20 @@
         110:33897590846
     };
 
+    const BASE_EXP_90 = 8850000;
+    const BASE_EXP_100 = 54166667;
+
     // 初始化表格內容
     const tbody = document.getElementById('expBody');
     for (let lv in EXP_DATA) {
         let row = tbody.insertRow();
         row.insertCell(0).innerText = lv;
         row.insertCell(1).innerText = EXP_DATA[lv].toLocaleString();
+    }
+
+    function toggleServerInput() {
+        const isChecked = document.getElementById('enableServerBuff').checked;
+        document.getElementById('serverBuffContainer').style.display = isChecked ? 'block' : 'none';
     }
 
     function setTime(id) {
@@ -277,14 +374,11 @@
         return h * 60 + m + (s || 0) / 60;
     }
 
-    // 計算指定等級與百分比下的「絕對總累積經驗」
     function getAbsoluteTotalExp(lv, pct) {
         let sum = 0;
-        // 累加 1 到 lv 的經驗
         for (let i = 1; i <= lv; i++) {
             sum += EXP_DATA[i];
         }
-        // 加上目前升下一級 (lv+1) 已經跑的百分比
         const nextExp = EXP_DATA[lv + 1] || 0;
         return sum + (nextExp * (pct / 100));
     }
@@ -293,7 +387,8 @@
         if (totalHours <= 0) return "0 分鐘";
         const h = Math.floor(totalHours);
         const m = Math.round((totalHours - h) * 60);
-        return `${h} 小時 ${m} 分鐘`;
+        const days = (totalHours / 24).toFixed(1);
+        return `${h} 小時 ${m} 分鐘 (約 ${days} 天)`;
     }
 
     function calculate() {
@@ -319,18 +414,16 @@
             alert("目標等級必須高於當前等級！"); return;
         }
 
-        // 1. 計算時薪
+        // 1. 計算時薪 (純日常掛機)
         const exp1 = getAbsoluteTotalExp(lv1, p1);
         const exp2 = getAbsoluteTotalExp(lv2, p2);
         const gained = exp2 - exp1;
         const expPerHour = (gained / diff) * 60;
 
-        // 2. 計算升下一級所需
+        // 2. 計算升下一級與到達目標等級所需經驗
         const nextLevelNeed = (EXP_DATA[lv2 + 1] || 0) * (1 - (p2 / 100));
         const timeToNext = expPerHour > 0 ? (nextLevelNeed / expPerHour) : 0;
 
-        // 3. 計算到目標等級所需
-        // 目標等級的總經驗 = 累加到 targetLv 之前的全部
         let targetTotalExp = 0;
         for (let i = 1; i <= targetLv; i++) {
             targetTotalExp += EXP_DATA[i];
@@ -338,20 +431,53 @@
         const remainingToTarget = targetTotalExp - exp2;
         const timeToTarget = expPerHour > 0 ? (remainingToTarget / expPerHour) : 0;
 
+        // 3. 計算每日任務經驗
+        let totalMultiplier = 1;
+        
+        // 伺服器加成
+        if (document.getElementById('enableServerBuff').checked) {
+            const serverPct = parseFloat(document.getElementById('serverBuffPct').value) || 0;
+            totalMultiplier += (serverPct / 100);
+        }
+        // 選項加成
+        if (document.getElementById('buffChar').checked) totalMultiplier += 0.10;
+        if (document.getElementById('buffAcc').checked) totalMultiplier += 0.10;
+        if (document.getElementById('buffPotion').checked) totalMultiplier += 0.50;
+
+        const count90 = parseInt(document.getElementById('task90Count').value) || 0;
+        const count100 = parseInt(document.getElementById('task100Count').value) || 0;
+
+        const exp90Total = BASE_EXP_90 * totalMultiplier * count90;
+        const exp100Total = BASE_EXP_100 * totalMultiplier * count100;
+        const dailyTaskExpTotal = exp90Total + exp100Total;
+
+        // 4. 計算 每日任務 + 日常掛機(假設24小時) 的每日總獲得經驗與預估天數
+        const dailyGrindExp = expPerHour * 24;
+        const dailyTotalCombinedExp = dailyGrindExp + dailyTaskExpTotal;
+        const daysToTargetCombined = dailyTotalCombinedExp > 0 ? (remainingToTarget / dailyTotalCombinedExp) : 0;
+
         // 顯示結果
         document.getElementById('result').style.display = 'block';
         document.getElementById('resInterval').innerText = diff.toFixed(1);
         document.getElementById('resRate').innerText = Math.floor(expPerHour).toLocaleString();
+        document.getElementById('resDailyTaskExp').innerText = Math.floor(dailyTaskExpTotal).toLocaleString();
         
         const nextBox = document.getElementById('resToNext');
         const targetBox = document.getElementById('resToTarget');
+        const combinedBox = document.getElementById('resDailyCombined');
 
         if (expPerHour > 0) {
-            nextBox.innerHTML = `距離升級至 <b>${lv2 + 1}</b> 級還需：<span style="color:var(--primary)">${formatTime(timeToNext)}</span>`;
-            targetBox.innerHTML = `🏁 到達目標等級 <b>${targetLv}</b> 級總共還需：<span style="color:var(--primary)">${formatTime(timeToTarget)}</span>`;
+            nextBox.innerHTML = `距離升級至 <b>${lv2 + 1}</b> 級還需 (純掛機)：<span style="color:var(--primary)">${formatTime(timeToNext)}</span>`;
+            targetBox.innerHTML = `🏁 到達目標等級 <b>${targetLv}</b> 級還需 (純掛機)：<span style="color:var(--primary)">${formatTime(timeToTarget)}</span>`;
         } else {
-            nextBox.innerText = "經驗值無增長，無法預估時間。";
+            nextBox.innerText = "經驗值無增長，無法預估純掛機時間。";
             targetBox.innerText = "";
+        }
+
+        if (dailyTotalCombinedExp > 0) {
+            combinedBox.innerHTML = `🚀 【每日任務 + 日常24h掛機】預估到達 <b>${targetLv}</b> 級還需：<span class="highlight-accent">${daysToTargetCombined.toFixed(1)} 天</span>`;
+        } else {
+            combinedBox.innerText = "尚無每日獲得經驗值（掛機或任務），無法推估綜合天數。";
         }
     }
 </script>
