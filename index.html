@@ -28,6 +28,8 @@
             --btn-now-bg: #cbd5e1;
             --btn-now-text: #1e293b;
             --btn-now-hover: #94a3b8;
+            --btn-danger: #ef4444;
+            --btn-danger-hover: #dc2626;
         }
 
         /* 暗色模式變數覆蓋 */
@@ -54,6 +56,8 @@
             --btn-now-bg: #334155;
             --btn-now-text: #f8fafc;
             --btn-now-hover: #475569;
+            --btn-danger: #f87171;
+            --btn-danger-hover: #ef4444;
         }
 
         body {
@@ -178,7 +182,7 @@
             color: var(--text-dim);
         }
 
-        input[type="number"], input[type="time"] {
+        input[type="number"], input[type="time"], input[type="text"] {
             width: 100%;
             padding: 10px;
             border: 1px solid var(--border);
@@ -240,6 +244,37 @@
         }
 
         .btn-now:hover { background: var(--btn-now-hover); }
+
+        .btn-add {
+            background: var(--card-bg);
+            color: var(--primary);
+            border: 1px dashed var(--primary);
+            padding: 8px 12px;
+            font-size: 0.85rem;
+            width: 100%;
+            margin-top: 8px;
+            border-radius: 6px;
+        }
+
+        .btn-add:hover {
+            background: var(--primary);
+            color: white;
+            border-style: solid;
+        }
+
+        .btn-del {
+            background: var(--btn-danger);
+            color: white;
+            padding: 0 10px;
+            height: 42px;
+            font-size: 0.85rem;
+            border-radius: 6px;
+            flex-shrink: 0;
+        }
+
+        .btn-del:hover {
+            background: var(--btn-danger-hover);
+        }
 
         .btn-calc {
             width: 100%;
@@ -305,6 +340,14 @@
             border-radius: 8px;
             padding: 12px;
             margin-top: 10px;
+        }
+
+        .potion-row {
+            margin-bottom: 8px;
+        }
+
+        .potion-row:last-child {
+            margin-bottom: 0;
         }
 
         /* 贊助 Modal 彈窗樣式 */
@@ -516,6 +559,28 @@
                 </div>
             </div>
         </div>
+
+        <div style="margin-top: 15px; border-top: 1px dashed var(--border); padding-top: 15px;">
+            <div id="potionContainer">
+                <div class="potion-row grid" style="grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+                    <div>
+                        <label>補品名稱</label>
+                        <input type="text" class="potion-name" placeholder="例如: 紅色藥水">
+                    </div>
+                    <div>
+                        <label>先前數量</label>
+                        <input type="number" class="old-potion-count" min="0" placeholder="先前數量">
+                    </div>
+                    <div>
+                        <label>當前數量</label>
+                        <div class="flex-row">
+                            <input type="number" class="new-potion-count" min="0" placeholder="當前數量">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button class="btn-add" onclick="addPotionRow()">➕ 新增補品紀錄</button>
+        </div>
     </div>
 
     <!-- 目標推估 -->
@@ -532,6 +597,7 @@
     <div id="result" class="result-box">
         <div class="res-item">間隔時間：<span id="resInterval" class="highlight">0</span> 分鐘</div>
         <div class="res-item">每小時獲得經驗 (純掛機)：<span id="resRate" class="highlight">0</span></div>
+        <div class="res-item" id="resPotionUsage"></div>
         <div class="res-item">每日任務獲得總經驗：<span id="resDailyTaskExp" class="highlight">0</span></div>
         <hr style="border:0; border-top: 1px solid var(--result-border); margin: 15px 0;">
         <div class="res-item" id="resToNext"></div>
@@ -635,6 +701,38 @@
         return `${h} 小時 ${m} 分鐘 (約 ${days} 天)`;
     }
 
+    function addPotionRow() {
+        const container = document.getElementById('potionContainer');
+        const rows = container.getElementsByClassName('potion-row');
+        const index = rows.length;
+        
+        const div = document.createElement('div');
+        div.className = 'potion-row grid';
+        div.style.gridTemplateColumns = '1fr 1fr 1fr';
+        div.style.gap = '10px';
+        
+        div.innerHTML = `
+            <div>
+                <input type="text" class="potion-name" placeholder="例如: 紅色藥水">
+            </div>
+            <div>
+                <input type="number" class="old-potion-count" min="0" placeholder="先前數量">
+            </div>
+            <div>
+                <div class="flex-row">
+                    <input type="number" class="new-potion-count" min="0" placeholder="當前數量">
+                    <button class="btn-del" onclick="removePotionRow(this)">✕</button>
+                </div>
+            </div>
+        `;
+        container.appendChild(div);
+    }
+
+    function removePotionRow(btn) {
+        const row = btn.closest('.potion-row');
+        row.remove();
+    }
+
     function calculate() {
         const t1 = parseToMinutes(document.getElementById('oldTime').value);
         const t2 = parseToMinutes(document.getElementById('newTime').value);
@@ -699,6 +797,39 @@
         const dailyGrindExp = expPerHour * 24;
         const dailyTotalCombinedExp = dailyGrindExp + dailyTaskExpTotal;
         const daysToTargetCombined = dailyTotalCombinedExp > 0 ? (remainingToTarget / dailyTotalCombinedExp) : 0;
+
+        // 5. 計算補品每小時消耗量 (支援多列)
+        const potionContainer = document.getElementById('potionContainer');
+        const potionRows = potionContainer.getElementsByClassName('potion-row');
+        const potionBox = document.getElementById('resPotionUsage');
+        let potionResults = [];
+
+        for (let row of potionRows) {
+            const pName = row.querySelector('.potion-name').value.trim() || '補品';
+            const pOldStr = row.querySelector('.old-potion-count').value;
+            const pNewStr = row.querySelector('.new-potion-count').value;
+
+            if (pOldStr !== '' && pNewStr !== '') {
+                const pOld = parseFloat(pOldStr);
+                const pNew = parseFloat(pNewStr);
+                if (!isNaN(pOld) && !isNaN(pNew)) {
+                    const consumed = pOld - pNew;
+                    if (consumed >= 0) {
+                        const consumedPerHour = Math.round((consumed / diff) * 60);
+                        potionResults.push(`每小時消耗【${pName}】：<span class="highlight">${consumedPerHour.toLocaleString()}</span> 個`);
+                    } else {
+                        potionResults.push(`每小時消耗【${pName}】：<span class="highlight" style="color:#ef4444">當前數量不能高於先前數量</span>`);
+                    }
+                }
+            }
+        }
+
+        if (potionResults.length > 0) {
+            potionBox.style.display = 'block';
+            potionBox.innerHTML = potionResults.join('<br>');
+        } else {
+            potionBox.style.display = 'none';
+        }
 
         // 顯示結果
         document.getElementById('result').style.display = 'block';
