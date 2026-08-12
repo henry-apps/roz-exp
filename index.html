@@ -502,7 +502,7 @@
             <label class="checkbox-label"><input type="checkbox" id="buffPotion"> EXPUP 藥水 50%</label>
         </div>
 
-        <div class="grid" style="margin-top: 10px;">
+        <div class="grid" style="margin-top: 10px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
             <div class="task-subcard">
                 <label style="color:var(--primary);">【90 級每日任務】</label>
                 <div class="input-group" style="margin-top: 8px;">
@@ -515,6 +515,13 @@
                 <div class="input-group" style="margin-top: 8px;">
                     <label>達成任務數：</label>
                     <input type="number" id="task100Count" value="0" min="0" placeholder="0">
+                </div>
+            </div>
+            <div class="task-subcard">
+                <label style="color:var(--primary);">【105 級每日任務】</label>
+                <div class="input-group" style="margin-top: 8px;">
+                    <label>達成任務數：</label>
+                    <input type="number" id="task105Count" value="0" min="0" placeholder="0">
                 </div>
             </div>
         </div>
@@ -659,6 +666,7 @@
 
     const BASE_EXP_90 = 8850000;
     const BASE_EXP_100 = 54166667;
+    const BASE_EXP_105 = 136226815;
 
     // 初始化表格內容
     const tbody = document.getElementById('expBody');
@@ -788,10 +796,12 @@
 
         const count90 = parseInt(document.getElementById('task90Count').value) || 0;
         const count100 = parseInt(document.getElementById('task100Count').value) || 0;
+        const count105 = parseInt(document.getElementById('task105Count').value) || 0;
 
         const exp90Total = BASE_EXP_90 * totalMultiplier * count90;
         const exp100Total = BASE_EXP_100 * totalMultiplier * count100;
-        const dailyTaskExpTotal = exp90Total + exp100Total;
+        const exp105Total = BASE_EXP_105 * totalMultiplier * count105;
+        const dailyTaskExpTotal = exp90Total + exp100Total + exp105Total;
 
         // 4. 計算 每日任務 + 日常掛機(假設24小時) 的每日總獲得經驗與預估天數
         const dailyGrindExp = expPerHour * 24;
