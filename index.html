@@ -6,162 +6,206 @@
     <title>ROZ 升級經驗分析工具</title>
     <style>
         :root {
-            --primary: #2563eb;
-            --primary-hover: #1d4ed8;
-            --bg: #ffffff;
-            --card-bg: #f8fafc;
-            --border: #e2e8f0;
-            --text-main: #1e293b;
-            --text-dim: #64748b;
-            --success: #059669;
-            --sponsor: #f59e0b;
-            --sponsor-hover: #d97706;
-            --card-server-bg: #eff6ff;
-            --card-server-border: #bfdbfe;
-            --result-bg: #f0fdf4;
-            --result-border: #bbf7d0;
-            --result-text: #166534;
-            --input-bg: #ffffff;
-            --table-bg: #ffffff;
-            --task-bg: #ffffff;
-            --modal-bg: #ffffff;
-            --btn-now-bg: #cbd5e1;
+            /* 日間模式：亮色 Cyberpunk / Sci-Fi 科技風格 */
+            --bg: #f0f4f9;
+            --bg-glow: radial-gradient(circle at 50% 0%, rgba(0, 242, 254, 0.15), transparent 70%);
+            --card-bg: rgba(255, 255, 255, 0.75);
+            --card-border: rgba(0, 242, 254, 0.3);
+            --card-glow: rgba(0, 242, 254, 0.08);
+            
+            --primary: #0072ff;
+            --primary-hover: #0056c7;
+            --primary-glow: rgba(0, 114, 255, 0.3);
+            --accent-purple: #7928ca;
+            --success: #00ab55;
+            --success-glow: rgba(0, 171, 85, 0.2);
+            /* 修改：贊助作者按鈕顏色改為賽博龐克螢光藍 */
+            --sponsor: #00f2fe;
+            --sponsor-hover: #00c6ff;
+            
+            --text-main: #0f172a;
+            --text-dim: #475569;
+            --input-bg: rgba(255, 255, 255, 0.9);
+            --table-bg: rgba(255, 255, 255, 0.8);
+            --task-bg: rgba(241, 245, 249, 0.6);
+            --modal-bg: rgba(255, 255, 255, 0.9);
+            
+            --btn-now-bg: #e2e8f0;
             --btn-now-text: #1e293b;
-            --btn-now-hover: #94a3b8;
+            --btn-now-hover: #cbd5e1;
             --btn-danger: #ef4444;
             --btn-danger-hover: #dc2626;
+
+            --result-bg: rgba(236, 253, 245, 0.85);
+            --result-border: #00ff87;
+            --result-text: #065f46;
         }
 
-        /* 暗色模式變數覆蓋 */
+        /* 暗色模式變數覆蓋：Cyberpunk 賽博龐克微光暗色系 */
         [data-theme="dark"] {
-            --primary: #3b82f6;
-            --primary-hover: #60a5fa;
-            --bg: #0f172a;
-            --card-bg: #1e293b;
-            --border: #334155;
-            --text-main: #f8fafc;
+            --bg: #090d16;
+            --bg-glow: radial-gradient(circle at 50% 0%, rgba(121, 40, 202, 0.25), transparent 70%);
+            --card-bg: rgba(15, 23, 42, 0.65);
+            --card-border: rgba(0, 242, 254, 0.25);
+            --card-glow: rgba(0, 242, 254, 0.05);
+
+            --primary: #00f2fe;
+            --primary-hover: #38ef7d;
+            --primary-glow: rgba(0, 242, 254, 0.4);
+            --accent-purple: #7928ca;
+            --success: #00ff87;
+            --success-glow: rgba(0, 255, 135, 0.3);
+            /* 修改：贊助作者按鈕顏色改為賽博龐克螢光藍 */
+            --sponsor: #00f2fe;
+            --sponsor-hover: #00c6ff;
+
+            --text-main: #f1f5f9;
             --text-dim: #94a3b8;
-            --success: #10b981;
-            --sponsor: #f59e0b;
-            --sponsor-hover: #d97706;
-            --card-server-bg: #1e3a8a;
-            --card-server-border: #2563eb;
-            --result-bg: #064e3b;
-            --result-border: #059669;
-            --result-text: #a7f3d0;
-            --input-bg: #0f172a;
-            --table-bg: #0f172a;
-            --task-bg: #0f172a;
-            --modal-bg: #1e293b;
-            --btn-now-bg: #334155;
-            --btn-now-text: #f8fafc;
-            --btn-now-hover: #475569;
+            --input-bg: rgba(9, 13, 22, 0.8);
+            --table-bg: rgba(15, 23, 42, 0.8);
+            --task-bg: rgba(15, 23, 42, 0.5);
+            --modal-bg: rgba(15, 23, 42, 0.9);
+
+            --btn-now-bg: #1e293b;
+            --btn-now-text: #00f2fe;
+            --btn-now-hover: #334155;
             --btn-danger: #f87171;
             --btn-danger-hover: #ef4444;
+
+            --result-bg: rgba(6, 78, 59, 0.4);
+            --result-border: #00ff87;
+            --result-text: #a7f3d0;
         }
 
         body {
-            font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+            font-family: 'PingFang TC', 'Microsoft JhengHei', -apple-system, sans-serif;
             background-color: var(--bg);
+            background-image: var(--bg-glow);
+            background-attachment: fixed;
             color: var(--text-main);
             margin: 0;
-            padding: 20px;
+            padding: 24px 16px;
             line-height: 1.6;
-            transition: background-color 0.3s, color 0.3s;
+            transition: background-color 0.4s, color 0.4s;
         }
 
         .container {
-            max-width: 800px;
+            max-width: 860px;
             margin: 0 auto;
-            position: relative;
         }
 
-        /* 頁首頂欄與贊助按鈕 (已修正為真正置中) */
+        /* 頁首頂欄：改為 Flex 彈性排版，徹底解決按鈕擋住標題問題 */
         .header-bar {
             display: flex;
-            justify-content: center;
+            justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
-            position: relative;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 24px;
+            padding: 12px 20px;
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            box-shadow: 0 0 15px var(--card-glow);
         }
 
         h1 {
             margin: 0;
-            color: var(--primary);
-            font-weight: 700;
-            font-size: 1.8rem;
-            text-align: center;
+            color: var(--text-main);
+            font-weight: 800;
+            font-size: 1.6rem;
+            letter-spacing: 1px;
+            text-shadow: 0 0 10px var(--primary-glow);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* 修改：標題左側閃電為螢光藍顏色 */
+        .lightning-blue {
+            color: #00f2fe;
+            text-shadow: 0 0 8px rgba(0, 242, 254, 0.8);
         }
 
         .header-actions {
-            position: absolute;
-            right: 0;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
         }
 
         .btn-theme {
             background: var(--card-bg);
             color: var(--text-main);
-            border: 1px solid var(--border);
-            padding: 8px 12px;
+            border: 1px solid var(--card-border);
+            padding: 8px 16px;
             border-radius: 20px;
-            font-size: 0.9rem;
+            font-size: 0.88rem;
             font-weight: 600;
             display: flex;
             align-items: center;
             gap: 6px;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(8px);
         }
 
         .btn-theme:hover {
             border-color: var(--primary);
-            transform: translateY(-1px);
+            box-shadow: 0 0 12px var(--primary-glow);
+            transform: translateY(-2px);
         }
 
         .btn-sponsor {
-            background: var(--sponsor);
-            color: white;
-            padding: 8px 16px;
+            background: linear-gradient(135deg, var(--sponsor), var(--sponsor-hover));
+            color: #000;
+            padding: 8px 18px;
             border-radius: 20px;
-            font-size: 0.9rem;
-            font-weight: 600;
+            font-size: 0.88rem;
+            font-weight: 700;
             display: flex;
             align-items: center;
             gap: 6px;
-            box-shadow: 0 2px 4px rgba(245, 158, 11, 0.3);
-            transition: all 0.2s;
+            box-shadow: 0 0 12px rgba(0, 242, 254, 0.4);
+            transition: all 0.2s ease;
         }
 
         .btn-sponsor:hover {
-            background: var(--sponsor-hover);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 6px rgba(245, 158, 11, 0.4);
+            background: linear-gradient(135deg, var(--sponsor-hover), #00a8ff);
+            transform: translateY(-2px);
+            box-shadow: 0 0 18px rgba(0, 242, 254, 0.7);
         }
 
+        /* 賽博龐克 HUD 玻璃卡片 */
         .card {
             background: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: 12px;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
             padding: 24px;
             margin-bottom: 20px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2), 0 0 12px var(--card-glow);
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .card:hover {
+            border-color: rgba(0, 242, 254, 0.45);
         }
 
         .card-server {
-            background: var(--card-server-bg);
-            border-color: var(--card-server-border);
+            border-left: 4px solid var(--primary);
         }
 
         h2 {
-            font-size: 1.1rem;
+            font-size: 1.15rem;
             margin-top: 0;
-            margin-bottom: 15px;
+            margin-bottom: 16px;
             padding-bottom: 8px;
-            border-bottom: 2px solid var(--border);
+            border-bottom: 1px solid var(--card-border);
             color: var(--text-main);
+            letter-spacing: 0.5px;
         }
 
         .grid {
@@ -178,39 +222,42 @@
             display: block;
             font-size: 0.85rem;
             font-weight: 600;
-            margin-bottom: 5px;
+            margin-bottom: 6px;
             color: var(--text-dim);
+            letter-spacing: 0.3px;
         }
 
         input[type="number"], input[type="time"], input[type="text"] {
             width: 100%;
-            padding: 10px;
-            border: 1px solid var(--border);
-            border-radius: 6px;
+            padding: 10px 12px;
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
             box-sizing: border-box;
-            font-size: 1rem;
+            font-size: 0.95rem;
             outline: none;
             background-color: var(--input-bg);
             color: var(--text-main);
+            transition: all 0.2s ease;
         }
 
         input:focus {
             border-color: var(--primary);
+            box-shadow: 0 0 10px var(--primary-glow);
         }
 
         .checkbox-group {
             display: flex;
             flex-wrap: wrap;
-            gap: 12px;
+            gap: 16px;
             margin-bottom: 10px;
         }
 
         .checkbox-label {
             display: inline-flex;
             align-items: center;
-            gap: 5px;
+            gap: 6px;
             font-size: 0.9rem;
-            font-weight: normal;
+            font-weight: 500;
             color: var(--text-main);
             cursor: pointer;
         }
@@ -218,6 +265,7 @@
         .checkbox-label input {
             width: auto;
             cursor: pointer;
+            accent-color: var(--primary);
         }
 
         .flex-row {
@@ -228,98 +276,119 @@
 
         button {
             cursor: pointer;
-            border-radius: 6px;
+            border-radius: 8px;
             font-weight: 600;
-            transition: all 0.2s;
+            transition: all 0.2s ease;
             border: none;
+        }
+
+        button:active {
+            transform: scale(0.97);
         }
 
         .btn-now {
             background: var(--btn-now-bg);
             color: var(--btn-now-text);
-            padding: 0 12px;
-            font-size: 0.75rem;
+            border: 1px solid var(--card-border);
+            padding: 0 14px;
+            font-size: 0.8rem;
             height: 40px;
             white-space: nowrap;
         }
 
-        .btn-now:hover { background: var(--btn-now-hover); }
+        .btn-now:hover {
+            background: var(--btn-now-hover);
+            box-shadow: 0 0 8px var(--primary-glow);
+        }
 
         .btn-add {
-            background: var(--card-bg);
+            background: transparent;
             color: var(--primary);
             border: 1px dashed var(--primary);
-            padding: 8px 12px;
-            font-size: 0.85rem;
+            padding: 10px 12px;
+            font-size: 0.88rem;
             width: 100%;
-            margin-top: 8px;
-            border-radius: 6px;
+            margin-top: 10px;
+            border-radius: 8px;
         }
 
         .btn-add:hover {
-            background: var(--primary);
-            color: white;
+            background: rgba(0, 242, 254, 0.1);
             border-style: solid;
+            box-shadow: 0 0 12px var(--primary-glow);
         }
 
         .btn-del {
             background: var(--btn-danger);
             color: white;
-            padding: 0 10px;
+            padding: 0 12px;
             height: 42px;
             font-size: 0.85rem;
-            border-radius: 6px;
+            border-radius: 8px;
             flex-shrink: 0;
         }
 
         .btn-del:hover {
             background: var(--btn-danger-hover);
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
         }
 
         .btn-calc {
             width: 100%;
             padding: 14px;
-            background: var(--primary);
-            color: white;
-            font-size: 1rem;
-            margin-top: 10px;
+            background: linear-gradient(135deg, var(--primary), var(--accent-purple));
+            color: #ffffff;
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin-top: 12px;
+            letter-spacing: 1px;
+            box-shadow: 0 0 15px var(--primary-glow);
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
         }
 
-        .btn-calc:hover { background: var(--primary-hover); }
+        .btn-calc:hover {
+            opacity: 0.95;
+            box-shadow: 0 0 25px var(--primary-glow);
+            transform: translateY(-1px);
+        }
 
         .result-box {
             display: none;
             background: var(--result-bg);
+            backdrop-filter: blur(12px);
             border: 1px solid var(--result-border);
             color: var(--result-text);
-            border-radius: 8px;
-            padding: 20px;
+            border-radius: 12px;
+            padding: 24px;
             margin-top: 20px;
+            box-shadow: 0 0 20px var(--success-glow);
         }
 
         .res-item {
-            margin-bottom: 10px;
-            font-size: 1rem;
+            margin-bottom: 12px;
+            font-size: 0.98rem;
         }
 
         .highlight {
             font-weight: 800;
-            font-size: 1.2rem;
+            font-size: 1.25rem;
             color: var(--primary);
+            text-shadow: 0 0 8px var(--primary-glow);
         }
 
         .highlight-accent {
             font-weight: 800;
-            font-size: 1.2rem;
+            font-size: 1.25rem;
             color: var(--success);
+            text-shadow: 0 0 8px var(--success-glow);
         }
 
         .table-preview {
-            max-height: 150px;
+            max-height: 160px;
             overflow-y: auto;
-            font-size: 0.8rem;
-            border: 1px solid var(--border);
-            border-radius: 4px;
+            font-size: 0.85rem;
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
             background: var(--table-bg);
         }
 
@@ -329,21 +398,30 @@
         }
 
         td, th {
-            padding: 6px;
-            border: 1px solid var(--border);
+            padding: 8px;
+            border: 1px solid var(--card-border);
             text-align: center;
+        }
+
+        /* 修改：讓表頭在捲動時固定在頂部 */
+        th {
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            background: var(--bg);
+            color: var(--primary);
+            box-shadow: 0 1px 0 var(--card-border);
         }
 
         .task-subcard {
             background: var(--task-bg);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 12px;
-            margin-top: 10px;
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            padding: 14px;
         }
 
         .potion-row {
-            margin-bottom: 8px;
+            margin-bottom: 10px;
         }
 
         .potion-row:last-child {
@@ -358,36 +436,37 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(15, 23, 42, 0.55);
-            backdrop-filter: blur(4px);
+            background: rgba(9, 13, 22, 0.75);
+            backdrop-filter: blur(8px);
             z-index: 1000;
             justify-content: center;
             align-items: center;
-            padding: 15px;
+            padding: 16px;
             box-sizing: border-box;
         }
 
         .modal-card {
             background: var(--modal-bg);
-            border-radius: 16px;
+            backdrop-filter: blur(16px);
+            border-radius: 20px;
             max-width: 480px;
             width: 100%;
             padding: 28px;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4), 0 0 20px var(--card-glow);
             position: relative;
             animation: modalFadeIn 0.25s ease-out;
-            border: 1px solid var(--border);
+            border: 1px solid var(--card-border);
         }
 
         @keyframes modalFadeIn {
-            from { opacity: 0; transform: translateY(12px) scale(0.98); }
+            from { opacity: 0; transform: translateY(16px) scale(0.96); }
             to { opacity: 1; transform: translateY(0) scale(1); }
         }
 
         .modal-close {
             position: absolute;
-            top: 16px;
-            right: 16px;
+            top: 18px;
+            right: 18px;
             background: transparent;
             border: none;
             font-size: 1.25rem;
@@ -397,57 +476,63 @@
             border-radius: 6px;
         }
 
-        .modal-close:hover { background: var(--border); color: var(--text-main); }
+        .modal-close:hover { background: var(--card-border); color: var(--text-main); }
 
         .modal-title {
-            font-size: 1.3rem;
+            font-size: 1.35rem;
             font-weight: 700;
             color: var(--text-main);
             margin-top: 0;
-            margin-bottom: 12px;
+            margin-bottom: 14px;
             display: flex;
             align-items: center;
             gap: 8px;
         }
 
         .info-box {
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 14px;
-            margin: 12px 0;
+            background: var(--task-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 16px;
+            margin: 14px 0;
         }
 
         .info-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 8px;
-            font-size: 0.95rem;
+            margin-bottom: 10px;
+            font-size: 0.92rem;
         }
 
         .info-row:last-child { margin-bottom: 0; }
 
         .copy-btn {
-            background: var(--border);
+            background: var(--btn-now-bg);
             color: var(--text-main);
-            padding: 3px 8px;
-            font-size: 0.75rem;
-            border-radius: 4px;
-            transition: background 0.2s;
+            border: 1px solid var(--card-border);
+            padding: 4px 10px;
+            font-size: 0.78rem;
+            border-radius: 6px;
+            transition: all 0.2s;
         }
 
-        .copy-btn:hover { background: var(--btn-now-hover); }
+        .copy-btn:hover { 
+            background: var(--primary); 
+            color: #ffffff;
+            box-shadow: 0 0 8px var(--primary-glow);
+        }
 
-        @media (max-width: 600px) {
+        @media (max-width: 640px) {
             .grid { grid-template-columns: 1fr; }
             .header-bar {
                 flex-direction: column;
-                gap: 12px;
                 align-items: center;
+                text-align: center;
             }
             .header-actions {
-                position: static; /* 手機版還原流向，避免遮擋 */
+                width: 100%;
+                justify-content: center;
             }
         }
     </style>
@@ -457,7 +542,7 @@
 <div class="container">
     <!-- 頁首與贊助按鈕 -->
     <div class="header-bar">
-        <h1>ROZ 升級經驗分析</h1>
+        <h1><span class="lightning-blue">⚡</span> ROZ 升級經驗分析</h1>
         <div class="header-actions">
             <button class="btn-theme" id="themeToggleBtn" onclick="toggleTheme()">
                 🌙 夜間模式
@@ -502,7 +587,7 @@
             <label class="checkbox-label"><input type="checkbox" id="buffPotion"> EXPUP 藥水 50%</label>
         </div>
 
-        <div class="grid" style="margin-top: 10px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+        <div class="grid" style="margin-top: 12px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
             <div class="task-subcard">
                 <label style="color:var(--primary);">【90 級每日任務】</label>
                 <div class="input-group" style="margin-top: 8px;">
@@ -567,7 +652,7 @@
             </div>
         </div>
 
-        <div style="margin-top: 15px; border-top: 1px dashed var(--border); padding-top: 15px;">
+        <div style="margin-top: 15px; border-top: 1px dashed var(--card-border); padding-top: 15px;">
             <div id="potionContainer">
                 <div class="potion-row grid" style="grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
                     <div>
@@ -595,7 +680,7 @@
         <h2>🎯 目標等級推估</h2>
         <label>想要達到的目標等級 (Lv)</label>
         <input type="number" id="targetLv" value="110" min="2" max="110">
-        <p style="font-size: 0.75rem; color: var(--text-dim); margin-top: 5px;">* 系統將計算從「當前狀態」到達此等級所需的總時間與預估天數。</p>
+        <p style="font-size: 0.78rem; color: var(--text-dim); margin-top: 6px;">* 系統將計算從「當前狀態」到達此等級所需的總時間與預估天數。</p>
         
         <button class="btn-calc" onclick="calculate()">分析每小時經驗與目標時間</button>
     </div>
@@ -618,7 +703,7 @@
     <div class="modal-card">
         <button class="modal-close" onclick="closeSponsorModal()">✕</button>
         <h3 class="modal-title">☕ 贊助作者 / 許願池</h3>
-        <p style="font-size: 0.95rem; color: var(--text-main); margin-bottom: 15px;">
+        <p style="font-size: 0.92rem; color: var(--text-main); margin-bottom: 15px;">
             如果您覺得這個工具不錯用，小額贊助作者會很感恩的！您的支持是持續維護與開發新功能的最大動力。
         </p>
         
@@ -636,7 +721,7 @@
 
         <div class="info-box" style="background: var(--result-bg); border-color: var(--result-border);">
             <div style="font-weight: bold; color: var(--success); margin-bottom: 6px;">🌟 許願池</div>
-            <div style="font-size: 0.9rem; color: var(--result-text); margin-bottom: 8px;">
+            <div style="font-size: 0.88rem; color: var(--result-text); margin-bottom: 8px;">
                 如果希望作者新增其他功能或有任何建議，歡迎寫信許願唷！
             </div>
             <div class="info-row">
@@ -712,7 +797,6 @@
     function addPotionRow() {
         const container = document.getElementById('potionContainer');
         const rows = container.getElementsByClassName('potion-row');
-        const index = rows.length;
         
         const div = document.createElement('div');
         div.className = 'potion-row grid';
