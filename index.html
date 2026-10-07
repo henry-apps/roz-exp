@@ -569,7 +569,7 @@
 
     <!-- 內建經驗表 -->
     <div class="card">
-        <h2>📊 內建等級經驗表 (Lv 1 - 110)</h2>
+        <h2>📊 內建等級經驗表 (Lv 1 - 120)</h2>
         <div class="table-preview">
             <table id="expTable">
                 <thead><tr><th>等級</th><th>升級所需經驗</th></tr></thead>
@@ -625,7 +625,7 @@
                 <div class="grid" style="grid-template-columns: 1fr 1fr;">
                     <div>
                         <label>等級</label>
-                        <input type="number" id="oldLv" value="1" min="1" max="109">
+                        <input type="number" id="oldLv" value="1" min="1" max="119">
                     </div>
                     <div>
                         <label>經驗 %</label>
@@ -642,7 +642,7 @@
                 <div class="grid" style="grid-template-columns: 1fr 1fr;">
                     <div>
                         <label>等級</label>
-                        <input type="number" id="newLv" value="1" min="1" max="109">
+                        <input type="number" id="newLv" value="1" min="1" max="119">
                     </div>
                     <div>
                         <label>經驗 %</label>
@@ -679,7 +679,7 @@
     <div class="card">
         <h2>🎯 目標等級推估</h2>
         <label>想要達到的目標等級 (Lv)</label>
-        <input type="number" id="targetLv" value="110" min="2" max="110">
+        <input type="number" id="targetLv" value="120" min="2" max="120">
         <p style="font-size: 0.78rem; color: var(--text-dim); margin-top: 6px;">* 系統將計算從「當前狀態」到達此等級所需的總時間與預估天數。</p>
         
         <button class="btn-calc" onclick="calculate()">分析每小時經驗與目標時間</button>
@@ -733,7 +733,7 @@
 </div>
 
 <script>
-    // 內建經驗值表
+    // 內建經驗值表 (已替換為新表格資料，支援至 Lv 120)
     const EXP_DATA = {
         1:0, 2:2443, 3:2711, 4:3009, 5:3339, 6:3706, 7:4113, 8:4565, 9:5067, 10:5624,
         11:6242, 12:6928, 13:7690, 14:8535, 15:9473, 16:10515, 17:11671, 18:12954, 19:14378, 20:15959,
@@ -744,9 +744,9 @@
         61:25789065, 62:29399534, 63:33515469, 64:38207635, 65:43556704, 66:49654642, 67:56606292, 68:64531173, 69:73565537, 70:83864712,
         71:94767124, 72:107086850, 73:121008141, 74:136739199, 75:154515294, 76:174602283, 77:197300579, 78:222949654, 79:251933109, 80:284684413,
         81:318846542, 82:357108127, 83:399961102, 84:447956434, 85:501711206, 86:561916551, 87:629346536, 88:704868120, 89:789452294, 90:884186569,
-        91:1061023882, 92:1273228658, 93:1527874389, 94:1833449266, 95:2200139119, 96:2640166942, 97:3168200330, 98:3801840396, 99:4562208475,
-        100:5474650170, 101:6569580204, 102:7883496244, 103:9460195492, 104:11352234590, 105:13622681508, 106:16347217809, 107:19616661370, 108:23539993644, 109:28247992372,
-        110:33897590846
+        91:990288957, 92:1109123631, 93:1242218466, 94:1391284681, 95:1558238842, 96:1745227503, 97:1954654803, 98:2189213379, 99:2451919884, 100:2746149262,
+        101:3295379114, 102:3954454936, 103:4745345923, 104:5694415107, 105:6833298128, 106:8199957753, 107:9839949303, 108:11807939163, 109:14169526995, 110:17003432394,
+        111:20404118872, 112:24484942646, 113:29381931175, 114:35258317410, 115:42309980892, 116:50771977070, 117:60926372484, 118:73111646980, 119:87733976376, 120:105280771651
     };
 
     const BASE_EXP_90 = 8850000;
@@ -758,7 +758,8 @@
     for (let lv in EXP_DATA) {
         let row = tbody.insertRow();
         row.insertCell(0).innerText = lv;
-        row.insertCell(1).innerText = EXP_DATA[lv].toLocaleString();
+        let expVal = EXP_DATA[lv];
+        row.insertCell(1).innerText = typeof expVal === 'number' ? expVal.toLocaleString() : expVal;
     }
 
     function toggleServerInput() {
@@ -780,9 +781,9 @@
     function getAbsoluteTotalExp(lv, pct) {
         let sum = 0;
         for (let i = 1; i <= lv; i++) {
-            sum += EXP_DATA[i];
+            sum += Number(EXP_DATA[i]) || 0;
         }
-        const nextExp = EXP_DATA[lv + 1] || 0;
+        const nextExp = Number(EXP_DATA[lv + 1]) || 0;
         return sum + (nextExp * (pct / 100));
     }
 
@@ -855,12 +856,12 @@
         const expPerHour = (gained / diff) * 60;
 
         // 2. 計算升下一級與到達目標等級所需經驗
-        const nextLevelNeed = (EXP_DATA[lv2 + 1] || 0) * (1 - (p2 / 100));
+        const nextLevelNeed = (Number(EXP_DATA[lv2 + 1]) || 0) * (1 - (p2 / 100));
         const timeToNext = expPerHour > 0 ? (nextLevelNeed / expPerHour) : 0;
 
         let targetTotalExp = 0;
         for (let i = 1; i <= targetLv; i++) {
-            targetTotalExp += EXP_DATA[i];
+            targetTotalExp += Number(EXP_DATA[i]) || 0;
         }
         const remainingToTarget = targetTotalExp - exp2;
         const timeToTarget = expPerHour > 0 ? (remainingToTarget / expPerHour) : 0;
